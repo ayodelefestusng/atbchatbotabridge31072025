@@ -1,0 +1,15 @@
+    __pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.env
+.vscode/
+.idea/
+*.log
+.env
+
+
+# My sensitive files
+.env

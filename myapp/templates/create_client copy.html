@@ -1,0 +1,33 @@
+Modify this code such that the chatbot, HR and Anallytics woould be a nested drop down under  Artificial Intelligence 
+Our Service 
+   Digitals
+   Financial Advisory
+   Loan Collections
+   Artificial Intelligence 
+         Chat Bot
+         HR
+        Analytic
+
+
+
+
+<li class="nav-item dropdown">
+                  <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Our Services
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'about' %}"><strong>Digitals</strong></a></li>
+                    <li><a class="dropdown-item" href="{% url 'about' %}"><strong>Financial Advisory</strong></a></li>
+                    <li><a class="dropdown-item" href="#"><strong>Loan Collections</strong></a></li>
+                    <li class="dropdown-submenu dropend">
+                      <a class="dropdown-item dropdown-toggle" href="#" id="artificialIntelligenceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <strong>Artificial Intelligence</strong>
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="artificialIntelligenceDropdown">
+                        <li><a class="dropdown-item" href="{% url 'about' %}"><strong>Chat Bot</strong></a></li>
+                        <li><a class="dropdown-item" href="{% url 'about' %}"><strong>HR</strong></a></li>
+                        <li><a class="dropdown-item" href="{% url 'about' %}"><strong>Analytic</strong></a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>

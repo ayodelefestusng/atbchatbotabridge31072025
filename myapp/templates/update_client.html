@@ -1,0 +1,7 @@
+<h2>Update Client: {{ client.company_name }}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Client</button>
+</form>
+<a href="{% url 'client_list' %}">Back to Client List</a>

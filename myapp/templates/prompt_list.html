@@ -1,0 +1,13 @@
+{% for prompt in prompts %}
+    <p><strong>Summarize Prompt:</strong> {{ prompt.summarize_prompt }}</p>
+    <p><strong>SQL Prompt:</strong> {{ prompt.sql_prompt }}</p>
+    <p><strong>Response Prompt:</strong> {{ prompt.response_prompt }}</p>
+    <p><strong>Type if Vendor(eg gemini) :</strong> {{ prompt.chatbot_model }}</p>
+    <p><strong>Variance Prompt :</strong> {{ prompt.variance_prompt }}</p>
+    <p><strong>Gemini model variant :</strong> {{ prompt.google_model}}</p>
+   
+
+
+    <a href="{% url 'update_prompt' prompt.id %}">Edit</a>
+    <hr>
+{% endfor %}

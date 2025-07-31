@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+media/
+*.sqlite3
+node_modules/
+.git
+.DS_Store
+.dockerignore
+docker-compose.yml

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Writer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h2 {
+            color: #0056b3;
+        }
+        textarea {
+            width: 80%;
+            max-width: 700px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.5;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output-section {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .output-section h3 {
+            color: #007bff;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .output-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 0;
+        }
+        .output-list li {
+            margin-bottom: 5px;
+        }
+        .output-thesaurus p {
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
+        .output-thesaurus span {
+            font-weight: normal;
+            color: #555;
+        }
+        .no-results {
+            color: #888;
+            font-style: italic;
+        }
+        /* Style for highlighted errors (not directly used in textarea, but for reference) */
+        .error-highlight {
+            background-color: #ffe0e0; /* Light red background */
+            border-bottom: 2px dashed red; /* Red dashed underline */
+            cursor: help;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        cookie = cookie.trim();
+                        if (cookie.startsWith(name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+            const textInput = document.getElementById('textInput');
+
+            // Output areas
+            const grammarChecksOutput = document.getElementById('grammarChecksOutput');
+            const suggestionsOutput = document.getElementById('suggestionsOutput');
+            const completionsOutput = document.getElementById('completionsOutput');
+            const thesaurusOutput = document.getElementById('thesaurusOutput');
+            const translatedTextOutput = document.getElementById('translatedTextOutput');
+
+
+            // Function to display lists
+            function displayList(container, title, items, messageIfEmpty = "No suggestions at the moment.") {
+                let html = `<h3>${title}</h3>`;
+                if (items && items.length > 0) {
+                    html += `<ul class="output-list">`;
+                    items.forEach(item => {
+                        html += `<li>${item}</li>`;
+                    });
+                    html += `</ul>`;
+                } else {
+                    html += `<p class="no-results">${messageIfEmpty}</p>`;
+                }
+                container.innerHTML = html;
+            }
+
+            // Function to display thesaurus
+            function displayThesaurus(container, title, data) {
+                let html = `<h3>${title}</h3>`;
+                if (Object.keys(data).length > 0 && !(Object.keys(data).length === 1 && data.hasOwnProperty('_note'))) { // Check for actual data, ignoring _note
+                    html += `<div class="output-thesaurus">`;
+                    for (const word in data) {
+                        if (word === '_note') continue; // Skip _note if present
+                        html += `<p>${word}: <span>${data[word].join(', ')}</span></p>`;
+                    }
+                    html += `</div>`;
+                } else if (data.hasOwnProperty('_note')) {
+                     html += `<p class="no-results">${data['_note']}</p>`;
+                } else {
+                    html += `<p class="no-results">No thesaurus suggestions found.</p>`;
+                }
+                container.innerHTML = html;
+            }
+
+
+            // Function to display grammar issues
+            function displayGrammarChecks(container, title, checks) {
+                let html = `<h3>${title}</h3>`;
+                if (checks && checks.length > 0) {
+                    html += `<ul class="output-list">`;
+                    checks.forEach(check => {
+                        html += `<li><strong>Error:</strong> ${check.message} <br> 
+                                 <strong>Context:</strong> "${check.context}"`;
+                        if (check.replacements && check.replacements.length > 0) {
+                            html += `<br> <strong>Suggestions:</strong> ${check.replacements.join(', ')}`;
+                        }
+                        html += `</li>`;
+                    });
+                    html += `</ul>`;
+                } else {
+                    html += `<p class="no-results">No grammar or spelling issues found. Great job!</p>`;
+                }
+                container.innerHTML = html;
+            }
+
+
+            // --- Main Text Processing Handler ---
+            document.getElementById('analyzeBtn').addEventListener('click', () => {
+                const text = textInput.value;
+                if (!text.trim()) {
+                    alert("Please enter some text to process.");
+                    return;
+                }
+
+                // Clear previous outputs
+                grammarChecksOutput.innerHTML = '';
+                suggestionsOutput.innerHTML = '';
+                completionsOutput.innerHTML = '';
+                thesaurusOutput.innerHTML = '';
+                translatedTextOutput.innerHTML = ''; // Also clear translation area
+
+
+                fetch('/process_text/', { // Changed endpoint to /process_text/
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        // Check if the response is JSON, otherwise parse as text
+                        return res.json().catch(() => res.text().then(text => ({ error: `Server error: ${res.status} ${res.statusText}. Response: ${text}` })));
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert(`Error processing text: ${data.error}`);
+                        console.error('Processing error:', data.error);
+                        return;
+                    }
+
+                    // Display Grammar Checks (enhanced)
+                    displayGrammarChecks(grammarChecksOutput, "Grammar & Spelling Checks", data.grammar_checks);
+
+                    // Display Suggestions (sentence rephrasing)
+                    displayList(suggestionsOutput, "Sentence Suggestions", data.suggestions, "No rephrasing suggestions at the moment.");
+
+                    // Display Sentence Completions
+                    displayList(completionsOutput, "Sentence Completions", data.sentence_completions, "No completions available.");
+
+                    // Display Thesaurus Suggestions
+                    displayThesaurus(thesaurusOutput, "Thesaurus Suggestions", data.thesaurus_suggestions);
+
+                    // Note: 'highlighted_spans' are available but require more complex JS
+                    // to render within the textarea or an overlay. For now, they are
+                    // implicitly handled by the grammar_checks output.
+                })
+                .catch(error => {
+                    console.error('Fetch error during text processing:', error);
+                    alert('An error occurred while processing text. Check console for details.');
+                });
+            });
+
+            // --- Translation Handler ---
+            document.getElementById('translateBtn').addEventListener('click', () => {
+                const text = textInput.value;
+                if (!text.trim()) {
+                    alert("Please enter some text to translate.");
+                    return;
+                }
+
+                // Clear previous translation
+                translatedTextOutput.innerHTML = '';
+
+                fetch('/translate/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        lang: 'fr' // You can add a language selector later
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        // Check if the response is JSON, otherwise parse as text
+                        return res.json().catch(() => res.text().then(text => ({ error: `Server error: ${res.status} ${res.statusText}. Response: ${text}` })));
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert(`Error translating text: ${data.error}`);
+                        console.error('Translation error:', data.error);
+                        translatedTextOutput.innerHTML = `<p style="color: red;"><strong>Translation Error:</strong> ${data.error}</p>`;
+                        return;
+                    }
+                    translatedTextOutput.innerHTML = `<p><strong>French Translation:</strong> ${data.translated_text}</p>`;
+                })
+                .catch(error => {
+                    console.error('Fetch error during translation:', error);
+                    alert('An error occurred during translation. Check console for details.');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Smart Writer</h2>
+    <textarea id="textInput" rows="10" cols="60" placeholder="Start typing your sentence here..."></textarea>
+    <br>
+    <button id="analyzeBtn">Analyze Text</button>
+    <button id="translateBtn">Translate (French)</button>
+
+    <div id="output" style="margin-top: 20px;">
+        <div id="grammarChecksOutput" class="output-section">
+            </div>
+        <div id="suggestionsOutput" class="output-section">
+            </div>
+        <div id="completionsOutput" class="output-section">
+            </div>
+        <div id="thesaurusOutput" class="output-section">
+            </div>
+        <div id="translatedTextOutput" class="output-section">
+            </div>
+    </div>
+</body>
+</html>

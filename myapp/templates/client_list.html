@@ -1,0 +1,18 @@
+<h2>Client List</h2>
+<a href="{% url 'create_client' %}">Add New Client</a>
+<hr>
+
+{% for client in clients %}
+    <p><strong>Company:</strong> {{ client.company_name }}</p>
+    <p><strong>Phone:</strong> {{ client.phone_number }}</p>
+    <p><strong>Address:</strong> {{ client.address }}</p>
+    <p><strong>City:</strong> {{ client.city }}</p>
+    <p><strong>State:</strong> {{ client.state }}</p>
+    <p><strong>Client ID:</strong> {{ client.client_id }}</p>
+    {% if client.logo %}
+        <img src="{{ client.logo.url }}" width="100">
+    {% endif %}
+    <br>
+    <a href="{% url 'update_client' client.id %}">Edit Client</a>
+    <hr>
+{% endfor %}

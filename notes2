@@ -1,0 +1,89 @@
+# Create a temporary container and run a command (e.g., 'ls /app' if your code is in /app)
+# This example assumes your application code is in the /app directory inside the image.
+# You might need to adjust '/app' based on the Dockerfile of the image.
+# If you're unsure, run `docker run -it --rm ayodelefestung/atbchatbot:chatbot18052025v1 bash`
+# then use `ls -F` to explore the filesystem and find where the main application code is.
+
+docker create --name temp_container ayodelefestung/atbchatbot:chatbot18052025v1
+
+# Copy files from the container to your local machine
+# Replace `/path/to/app/inside/container` with the actual path
+# Replace `C:\Users\Pro\Desktop\Ayodele\atbchatbot_code` with your desired local directory
+docker cp temp_container:/app C:\Users\Pro\Desktop\Ayodele\atbchatbot_code
+
+# Remove the temporary container
+docker rm temp_container
+
+
+
+
+
+cd C:\Users\Pro\Desktop\Ayodele\25062025
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\venv\Scripts\Activate.ps1
+cd C:\Users\Pro\Desktop\Ayodele\25062025\myproject
+ python manage.py runserver
+
+pip install pyngrok
+ngrok config add-authtoken 2z2Heq7u4A7O9dv6GyCLMlF04EP_7uFadw3h3Rc3F66goNHzW
+
+
+
+ngrok config add-authtoken 2z2Heq7u4A7O9dv6GyCLMlF04EP_7uFadw3h3Rc3F66goNHzW
+
+
+ngrok http --domain=definitely-genuine-dog.ngrok-free.app 8000  
+
+
+https://definitely-genuine-dog.ngrok-free.app/webhook/
+
+
+pip freeze > requirements.txt
+python manage.py collectstatic
+
+docker build -t ayodelefestung/atbchatbot:chatbot04072025v3 .
+docker login
+docker push ayodelefestung/atbchatbot:chatbot04072025v3
+
+
+
+
+
+
+
+
+TO RUN LOCALLY 
+docker run -p 8000:8000 ayodelefestung/atbchatbot:chatbot04072025v3 
+
+
+docker run --name ayula240720255v2 -d ayodelefestung/atbchatbot:chatbot24072025v2
+
+
+docker restart adoring_kepler
+
+
+if the image has change and want to keep using same container name 
+docker rm -f docker exec -it adoring_kepler bash
+docker run --name adoring_kepler -p 8000:8000 ayodelefestung/atbchatbot:chatbot04072025v2
+
+
+docker logs ajala_container     # To see the log 
+
+
+docker cp "C:\Users\Pro\Desktop\Ayodele\25062025\myproject\myapp\chat_bot.py" adoring_kepler:/app/chat_bot.py
+
+
+
+
+docker build -t ayodelefestung/atbchatbot:chatbot07072025v3 .
+
+docker push ayodelefestung/atbchatbot:chatbot07072025v3
+
+
+
+TO RUN LOCALLY 
+docker run -p 8000:8000 ayodelefestung/atbchatbot:chatbot07072025v3 
+
+
+vm password Linus Ubuntu
+changeme

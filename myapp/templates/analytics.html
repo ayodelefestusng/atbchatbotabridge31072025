@@ -1,0 +1,56 @@
+{% extends 'base1.html' %}
+
+{% block title %}Report{% endblock %}
+
+
+{% block content %}
+OYAKK
+{{yemi}}
+<table class="table caption-top">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Summary</th>
+      <th scope="col">Overall Sentiment </th>
+      <th scope="col">Ticket</th>
+      <th scope="col">Info Source</th>
+      <th scope="col">Time Stamp</th>
+    </tr>
+  </thead>
+  {% for i in insight %}
+  <tbody>
+    <tr>
+      <th scope="row">{{i.user.username  }}</th>
+       <td>{{ i.summary }}</td>
+      <td>{{ i.sum_sentiment }}</td>
+      {% comment %} <td>{{ i.sentiment }}</td> {% endcomment %}
+      <td>{{ i.sum_ticket }}</td>
+      <td>{{ i.source }}</td>
+      <td>{{ i.created_at }}</td>
+
+        </tr>
+    {% endfor %}
+  </tbody>
+</table>
+      
+
+{% endblock %}
+
+
+
+
+
+<body>
+ {% for i in insight %}
+    <h6>{{ i.session_id }}</h6>
+    <h6>{{ i.sentimentAnswer }}</h6>
+    <h6>{{ i.answer }}</h6>
+    <h6>{{ i.source }}</h6>
+    <h6>{{ i.ticket }}</h6>
+    <h6>{{ i.summary }}</h6>
+    <h6>{{ i.sentiment }}</h6>
+    <h6>{{ i.created_at }}</h6>
+    {% endfor %}
+    
+</body>
+</html>
